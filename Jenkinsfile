@@ -1,4 +1,3 @@
-
 node{
 def mavenhome = tool name: "maven 3.6.3"
 properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '5', numToKeepStr: '')), pipelineTriggers([pollSCM('* * * * *')])])
@@ -12,10 +11,10 @@ stage('ExcuteSonarQubeReport'){
 sh "${mavenhome}/bin/mvn sonar:sonar"
 }
 stage('UploadArctifactIntoNexus'){
-sh "${mavenHome}/bin/mvn deploy"
+sh "${mavenhome}/bin/mvn deploy"
 }
 stage('DeployAppIntoTomcatServer'){
-sh "${mavenHome}/bin/mvn deploy"
+sh "${mavenhome}/bin/mvn deploy"
 sshagent(['4e12b156-11c7-4c12-915b-dd2d4ae145ab']) {
     sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@15.207.117.252:/opt/apache-tomcat-9.0.46/webapps"
 }
@@ -27,6 +26,3 @@ kvkrishna''', subject: 'build is over', to: 'kurra.vamsi@gmail.com'
 }
 
 }
-
-
-
