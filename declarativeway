@@ -1,0 +1,58 @@
+pipeline{
+agent any
+triggers{
+pollSCM('* * * * *')
+}
+options{
+ timestamps()
+buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '4', daysToKeepStr: '', numToKeepStr: '5'))
+}
+tools{
+maven "maven 3.6.3"
+}
+stages{
+ stage('check out code'){
+ steps{
+git branch: 'development', credentialsId: '1252a808-d8a3-48f9-aac4-42abaf9dde34', url: 'https://github.com/kvkrishna1527/maven-web-application.git'
+}
+}
+stage('build'){
+steps{
+sh "mvn clean package"
+	}
+   }
+   stage('ExcuteSonarQubeReport'){
+steps{
+sh "mvn clean sonar:sonar"
+	}
+   }
+   stage('UploadArtifactIntoNexus'){
+steps{
+sh "mvn clean deploy"
+	}
+   }
+   stage('DeployAppIntotomcatServer'){
+steps{
+sshagent(['4e12b156-11c7-4c12-915b-dd2d4ae145ab']) {
+    sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@15.207.117.252:/opt/apache-tomcat-9.0.46/webapps"
+	}
+	}
+   }
+}
+post{
+success{
+emailext body: '''build is over - success!!
+
+regards
+kvkrishna agencies
+9966066338''', subject: 'build is over - success!!', to: 'kurra.vamsi@gmail.com'
+}
+failure{
+emailext body: '''build is over - failed!! 
+
+regards
+kvkrishna agencies
+9966066338''', subject: 'build is over - failed!!', to: 'kurra.vamsi@gmail.com'
+}
+}
+}
