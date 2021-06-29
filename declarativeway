@@ -3,13 +3,6 @@ pipeline{
 agent {
 label 'node1'
 }
-triggers{
-pollSCM('* * * * *')
-}
-options{
- timestamps()
-buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '4', daysToKeepStr: '', numToKeepStr: '5'))
-}
 tools{
 maven "maven 3.6.3"
 }
